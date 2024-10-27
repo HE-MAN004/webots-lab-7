@@ -1,0 +1,85 @@
+#VRML_SIM R2023a utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/objects/floors/protos/RectangleArena.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023a/projects/robots/gctronic/e-puck/protos/E-puck.proto"
+
+WorldInfo {
+}
+Viewpoint {
+  orientation -0.44539860592399355 0.5392207055421001 0.7147454879575266 1.7149740474678243
+  position -0.14508141328974697 -0.9103908896624967 1.6818386580298865
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+RectangleArena {
+  floorTileSize 0.4 0.4
+}
+E-puck {
+  controller "HelloWebots"
+}
+Solid {
+  translation 0.3 0.2 0.05
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 0.837415 0.113481 0.1075
+        }
+      }
+      geometry Cylinder {
+        height 0.1
+        radius 0.05
+      }
+    }
+  ]
+  boundingObject Cylinder {
+    height 0.1
+    radius 0.05
+  }
+}
+Solid {
+  translation -0.3 0.1 0.05
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 0.275471 0.837415 0.284001
+        }
+      }
+      geometry Cylinder {
+        height 0.1
+        radius 0.05
+      }
+    }
+  ]
+  name "solid(1)"
+  boundingObject Cylinder {
+    height 0.1
+    radius 0.05
+  }
+}
+Solid {
+  translation -0.2 -0.3 0.05
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 0.189014 0.203662 0.837415
+        }
+      }
+      geometry Cylinder {
+        height 0.1
+        radius 0.05
+      }
+    }
+  ]
+  name "solid(2)"
+  boundingObject Cylinder {
+    height 0.1
+    radius 0.05
+  }
+}

@@ -1,0 +1,61 @@
+#include <webots/Robot.hpp>
+#include <webots/Motor.hpp>
+#include <webots/DistanceSensor.hpp>
+#include <webots/PositionSensor.hpp>
+#include <limits>
+
+#define TIME_STEP 64
+
+constexpr double maxEpuckMotorSpeed{6.28};
+constexpr double epuckWheelRadius{0.0206};
+constexpr double epuckAxleLength{0.052};
+constexpr double obstacleThreshold = 72.0; // Adjust based on sensor lookup table
+constexpr double pi{3.14159265358979323846};
+constexpr double MAX_SPEED{6.28};
+
+int main(int argc, char **argv) {
+  webots::Robot *robot = new webots::Robot();
+
+  webots::Motor *leftMotor = robot->getMotor("left wheel motor");
+  webots::Motor *rightMotor = robot->getMotor("right wheel motor");
+  leftMotor->setPosition(INFINITY);
+  rightMotor->setPosition(INFINITY);
+  leftMotor->setVelocity(0.0);
+  rightMotor->setVelocity(0.0);
+
+
+  webots::DistanceSensor* frontSensorLeft = robot->getDistanceSensor("ps7");
+  webots::DistanceSensor* frontSensorRight = robot->getDistanceSensor("ps0");
+  webots::PositionSensor& leftSensor{*robot->getPositionSensor("left wheel sensor")};
+  webots::PositionSensor& rightSensor{*robot->getPositionSensor("right wheel sensor")};
+
+  frontSensorLeft->enable(TIME_STEP);
+  frontSensorRight->enable(TIME_STEP);
+
+  leftSensor.enable(TIME_STEP);
+  rightSensor.enable(TIME_STEP);
+
+  leftMotor->setPosition(std::numeric_limits<double>::infinity());
+  rightMotor->setPosition(std::numeric_limits<double>::infinity());
+  leftMotor->setVelocity(0.0);
+  rightMotor->setVelocity(0.0);
+
+  while (robot->step(TIME_STEP) != -1) {
+    double leftSpeed  = 0.5 * MAX_SPEED;
+    double rightSpeed = 0.5 * MAX_SPEED;
+
+    std::cout<<frontSensorLeft->getValue();
+
+    if (frontSensorLeft->getValue() > obstacleThreshold || frontSensorRight->getValue() > obstacleThreshold) {
+      // turn left
+      leftSpeed  = -0.5 * MAX_SPEED;
+      rightSpeed = 0.5 * MAX_SPEED;
+    }
+    // write actuators inputs
+    leftMotor->setVelocity(leftSpeed);
+    rightMotor->setVelocity(rightSpeed);
+  }
+  delete robot;
+
+  return 0;
+}

@@ -1,0 +1,70 @@
+#include <webots/Robot.hpp>
+#include <webots/Motor.hpp>
+#include <webots/DistanceSensor.hpp>
+#include <webots/PositionSensor.hpp>
+#include <limits>
+
+#define TIME_STEP 64
+
+constexpr double maxEpuckMotorSpeed{6.28};
+constexpr double epuckWheelRadius{0.0206};
+constexpr double epuckAxleLength{0.052};
+constexpr double obstacleThreshold = 80.0; // Adjust based on sensor lookup table
+constexpr double pi{3.14159265358979323846};
+constexpr double maxSpeed{6.28};
+
+void moveForward(webots::Motor* leftMotor, webots::Motor* rightMotor) {
+  leftMotor->setVelocity(0.5 * maxSpeed);
+  rightMotor->setVelocity(0.5 * maxSpeed);
+}
+
+
+int main(int argc, char **argv) {
+  webots::Robot robot;
+  double timeStep{robot.getBasicTimeStep()};
+
+  webots::Motor& leftMotor{*robot.getMotor("left wheel motor")};
+  webots::Motor& rightMotor{*robot.getMotor("right wheel motor")};
+
+  webots::DistanceSensor* frontSensorLeft = robot.getDistanceSensor("ps7");
+  webots::DistanceSensor* frontSensorRight = robot.getDistanceSensor("ps0");
+  webots::PositionSensor& leftSensor{*robot.getPositionSensor("left wheel sensor")};
+  webots::PositionSensor& rightSensor{*robot.getPositionSensor("right wheel sensor")};
+
+  frontSensorLeft->enable(timeStep);
+  frontSensorRight->enable(timeStep);
+
+  leftSensor.enable(timeStep);
+  rightSensor.enable(timeStep);
+
+  leftMotor.setPosition(std::numeric_limits<double>::infinity());
+  rightMotor.setPosition(std::numeric_limits<double>::infinity());
+  leftMotor.setVelocity(0.0);
+  rightMotor.setVelocity(0.0);
+
+  while (robot.step(timeStep) != -1) {
+    double frontDistance = frontSensorLeft->getValue();
+    std::cout << "Front distance: " << frontDistance << std::endl;
+    leftMotor.setPosition(INFINITY);
+    rightMotor.setPosition(INFINITY);
+
+
+    double left_speed  = 0.5 * maxSpeed;
+    double right_speed = 0.5 * maxSpeed;
+
+    if (frontDistance > obstacleThreshold) {
+      leftMotor.setVelocity(0.0);
+      rightMotor.setVelocity(0.0);
+
+      left_speed  = -0.5 * maxSpeed;
+      right_speed = 0.5 * maxSpeed;
+
+      robot.step(2000); // Wait for the turn to complete
+      std::cout << "Turned: " << std::endl;
+    } else {
+      moveForward(&leftMotor, &rightMotor);
+    }
+  }
+
+  return 0;
+}
